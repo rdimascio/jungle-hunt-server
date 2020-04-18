@@ -25,8 +25,8 @@ const Schema = gql`
 	  timestamp: String
   }
   type Query {
-	Stats(asin: String, collection: String): [Stat]
-    Products(asin: String, collection: String): [Product]
+	  Stats(asin: String, collection: String, limit: Int, offset: Int): [Stat]
+    Products(asin: String, collection: String, limit: Int, offset: Int): [Product]
   }
 `;
 

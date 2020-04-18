@@ -1,21 +1,19 @@
 'use strict'
 
-// const db = mongoose()
-// const cors = require('cors')
-// const graphqlHTTP = require('express-graphql')
-
+require('dotenv').config()
 const express = require('express')
-const config = require('./config')
 const Schema = require('./schema')
 const Mongoose = require('mongoose')
 const Resolvers = require('./resolvers')
-const { ApolloServer } = require('apollo-server-express')
+const { ApolloServer, AuthenticationError } = require('apollo-server-express')
 
 const PORT = process.env.PORT || 8080
 
-const mongoUrl = config.NODE_ENV === 'development'
-? 'mongodb://localhost:27017'
-: `mongodb://${config.DB_USER}:${config.DB_PWD}@${config.DB_IP}/${config.DB_DATABASE}`
+// const mongoUrl = process.env.NODE_ENV === 'development'
+// ? 'mongodb://localhost:27017'
+// : `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}/${process.env.DB_DATABASE}`
+
+const mongoUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}/${process.env.DB_DATABASE}`
 
 Mongoose.Promise = global.Promise;
 
@@ -39,7 +37,11 @@ Mongoose.connect(
 const apollo = new ApolloServer({
   typeDefs: Schema, 
   resolvers: Resolvers,
-  // context: ({req}) => ({ Product })
+  // context: ({req}) => {
+  //   const token = req.headers.authorization
+  //   if (token != `Bearer ${process.env.API_KEY}`) throw new AuthenticationError(`Get off my lawn!`)
+  //   return { user: { loggedIn: true } }
+  // }
 });
 
 apollo.applyMiddleware({ app, path })
