@@ -5,6 +5,14 @@ const Schema = gql`
     primary(name: String): String
     secondary(name: String): String
   }
+  type Stats {
+    timestamp: String
+    price: String
+    rank: Int
+    rating: String
+    reviews: Int
+    category: String
+  }
   type Product {
     asin: String
     title: String
@@ -13,7 +21,8 @@ const Schema = gql`
     price: String
     rating: String
     reviews: Int
-    rank: Int
+    rank: Int,
+    stats: [Stats!],
   }
   type Stat {
 	  asin: String
@@ -26,7 +35,7 @@ const Schema = gql`
   }
   type Query {
 	  Stats(asin: String, collection: String, limit: Int, offset: Int): [Stat]
-    Products(asin: String, collection: String, limit: Int, offset: Int): [Product]
+    Products(asin: String, category: String, collection: String, limit: Int, offset: Int, stats: Boolean): [Product]
   }
 `;
 

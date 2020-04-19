@@ -9,11 +9,9 @@ const { ApolloServer, AuthenticationError } = require('apollo-server-express')
 
 const PORT = process.env.PORT || 8080
 
-// const mongoUrl = process.env.NODE_ENV === 'development'
-// ? 'mongodb://localhost:27017'
-// : `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}/${process.env.DB_DATABASE}`
-
-const mongoUrl = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}/${process.env.DB_DATABASE}`
+const mongoUrl = process.env.NODE_ENV === 'development'
+  ? `mongodb://localhost:27017/${process.env.DB_DATABASE}`
+  : `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}/${process.env.DB_DATABASE}`
 
 Mongoose.Promise = global.Promise;
 
