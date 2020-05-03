@@ -10,6 +10,6 @@ const StatSchema = new Mongoose.Schema({
     timestamp: String
 });
 
-const Stats = (collection) => Mongoose.model(`${collection}Stats`, StatSchema, `${collection}Stats`);
+const Stats = (collection) => Mongoose.model(`${collection}Stat`, StatSchema);
 
 module.exports = Stats

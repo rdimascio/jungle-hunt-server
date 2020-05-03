@@ -10,7 +10,7 @@ COPY package-lock.json /var/api/package-lock.json
 
 RUN npm ci -qy --silent
 
-COPY . /var/api
+COPY . .
 
 EXPOSE 8080
 
