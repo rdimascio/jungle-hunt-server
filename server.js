@@ -8,6 +8,7 @@ const express = require('express')
 const Schema = require('./schema')
 const Mongoose = require('mongoose')
 const passport = require('passport')
+const User = require('./models/User')
 const Resolvers = require('./resolvers')
 const session = require('express-session')
 const AmazonStrategy = require('passport-amazon').Strategy
@@ -15,14 +16,14 @@ const {ApolloServer, AuthenticationError} = require('apollo-server-express')
 
 const app = express()
 const apiPath = '/api/v1/products'
-const buildPath = path.join(__dirname, './../app')
+const buildPath = path.resolve(__dirname, '../app/build/index.html')
 
 const DEV = process.env.NODE_ENV === 'development'
 const PORT = process.env.PORT || 8080
 const HOST = DEV ? `jungle_hunt_db:${process.env.DP_PORT}` : process.env.DB_IP
-const CLIENT = DEV ? 'http://localhost:3000' : 'junglehunt.io'
-const APP = DEV ? 'http://localhost:8080' : 'junglehunt.io'
-// const METHOD = DEV ? 'redirect' : 'sendFile'
+const CLIENT = DEV ? 'https://dev.junglehunt.io:3000' : 'https://dev.junglehunt.io'
+const APP = DEV ? 'https://dev.junglehunt.io:3000' : 'https://dev.junglehunt.io'
+const METHOD = DEV ? 'redirect' : 'sendFile'
 
 const mongoUrl = `mongodb://${`${process.env.DB_USER}:` || ''}${
 	`${process.env.DB_PWD}@` || ''
@@ -64,7 +65,7 @@ const ensureAuthenticated = (req, res, next) => {
 		return next()
 	}
 
-	res.redirect(`${CLIENT}/login`)
+	res[METHOD](CLIENT)
 }
 
 // Passport session setup.
@@ -85,14 +86,24 @@ passport.deserializeUser(function (obj, done) {
 const AMAZON_OPTIONS = {
 	clientID: process.env.AMAZON_LOGIN_CLIENT_ID,
 	clientSecret: process.env.AMAZON_LOGIN_CLIENT_SECRET,
-	callbackURL: 'http://localhost:8080/api/v1/auth/amazon/callback',
+	callbackURL: 'https://dev.junglehunt.io/api/v1/auth/amazon/callback',
 }
 
-const AMAZON_CALLBACK = (accessToken, refreshToken, profile, done) => {
+const AMAZON_CALLBACK = async (accessToken, refreshToken, profile, done) => {
 	// To keep the example simple, the user's Amazon profile is returned to
 	// represent the logged-in user.  In a typical application, you would want
 	// to associate the Amazon account with a user record in your database,
 	// and return that user instead.
+	const user = await User.findOne({email: 'ryan.dimascio@gmail.com'}, function (err, match) {
+  		if (err) return null
+  		return match
+	}).exec()
+	
+	console.log(user)
+	{
+		user_id: amazonId,
+		firstName
+	} = profile._json
 	return done(null, profile)
 }
 
@@ -113,7 +124,7 @@ app.use(function (req, res, next) {
 
 app.use(
 	cors({
-		origin: 'http://localhost:3000',
+		origin: 'https://dev.junglehunt.io:3000',
 		credentials: true,
 	})
 )
@@ -157,8 +168,8 @@ app.get(
 app.get(
 	'/api/v1/auth/amazon/callback',
 	passport.authenticate('amazon', {
-		successRedirect: `http://localhost:8080/api/v1/products`,
-		failureRedirect: `http://localhost:8080/api/v1/products`,
+		successRedirect: `https://dev.junglehunt.io/products`,
+		failureRedirect: `https://dev.junglehunt.io`,
 	})
 )
 
@@ -169,9 +180,9 @@ app.get('/api/v1/auth/logout', function (req, res) {
 
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', ensureAuthenticated, function (req, res, next) {
-	res.redirect(`${CLIENT}`)
+	res[METHOD](CLIENT)
 })
 
 app.listen(PORT, () => {
-	console.log(`🚀 Server ready at http://localhost:8080`)
+	console.log(`🚀 Server ready at https://dev.junglehunt.io/api/v1/products`)
 })
